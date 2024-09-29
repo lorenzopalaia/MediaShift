@@ -1,3 +1,5 @@
+import Dropzone from "@/components/Dropzone";
+
 export default function Home() {
   return (
     <div className="pb-8">
@@ -10,7 +12,7 @@ export default function Home() {
         can convert them to a different format. It is a simple, fast, and
         reliable service that can be used to convert files without any hassle.
       </p>
-      {/* <Dropzone /> */}
+      <Dropzone />
     </div>
   );
 }

@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { BsGithub } from "react-icons/bs";
-import ModeToggle from "@/components/ModeToggle";
+// import ModeToggle from "@/components/ModeToggle";
 import Logo from "@/components/Logo";
 
 export default function Navbar() {
