@@ -1,19 +1,11 @@
 import type { Metadata } from "next";
-import localFont from "next/font/local";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import ThemeProvider from "@/components/ThemeProvider";
 import Navbar from "@/components/Navbar";
+import { Toaster } from "@/components/ui/toaster";
 
-const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
-});
-const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
-});
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "MediaShift",
@@ -28,9 +20,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={inter.className}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
@@ -38,7 +28,10 @@ export default function RootLayout({
           themes={["light", "dark"]}
         >
           <Navbar />
-          {children}
+          <Toaster />
+          <div className="container max-w-4xl min-h-screen pt-32 lg:pt-36 2xl:pt-44 lg:max-w-6xl 2xl:max-w-7xl">
+            {children}
+          </div>
         </ThemeProvider>
       </body>
     </html>
