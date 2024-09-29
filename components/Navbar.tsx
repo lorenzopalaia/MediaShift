@@ -11,7 +11,7 @@ export default function Navbar() {
         <Logo className="mb-2 cursor-pointer w-8 dark:invert" />
       </Link>
       <div className="items-center hidden gap-2 md:flex">
-        <ModeToggle />
+        {/* <ModeToggle /> */}
         <Link href="https://github.com/lorenzopalaia/MediaShift">
           <Button
             variant="default"
@@ -25,9 +25,7 @@ export default function Navbar() {
           </Button>
         </Link>
       </div>
-      <div className="block-p-3 md:hidden">
-        <ModeToggle />
-      </div>
+      <div className="block-p-3 md:hidden">{/* <ModeToggle /> */}</div>
     </nav>
   );
 }

@@ -29,7 +29,7 @@ export default function RootLayout({
         >
           <Navbar />
           <Toaster />
-          <div className="container max-w-4xl min-h-screen pt-32 lg:pt-36 2xl:pt-44 lg:max-w-6xl 2xl:max-w-7xl">
+          <div className="container mx-auto max-w-4xl min-h-screen pt-32 lg:pt-36 2xl:pt-44 lg:max-w-6xl 2xl:max-w-7xl">
             {children}
           </div>
         </ThemeProvider>
