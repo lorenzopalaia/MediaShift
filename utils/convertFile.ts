@@ -2,36 +2,36 @@ import { Action } from "@/types";
 import { FFmpeg } from "@ffmpeg/ffmpeg";
 import { fetchFile } from "@ffmpeg/util";
 
-function getFileExtension(file_name: string) {
+function getFileExtension(fileName: string) {
   const regex = /(?:\.([^.]+))?$/;
-  const match = regex.exec(file_name);
+  const match = regex.exec(fileName);
   if (match && match[1]) {
     return match[1];
   }
   return "";
 }
 
-function removeFileExtension(file_name: string) {
-  const lastDotIndex = file_name.lastIndexOf(".");
+function removeFileExtension(fileName: string) {
+  const lastDotIndex = fileName.lastIndexOf(".");
   if (lastDotIndex !== -1) {
-    return file_name.slice(0, lastDotIndex);
+    return fileName.slice(0, lastDotIndex);
   }
-  return file_name;
+  return fileName;
 }
 
 export default async function convertFile(
   ffmpeg: FFmpeg,
   action: Action
-): Promise<any> {
-  const { file, to, file_name, file_type } = action;
-  const input = getFileExtension(file_name);
-  const output = removeFileExtension(file_name) + "." + to;
+): Promise<{ url: string; output: string }> {
+  const { file, to, fileName, fileType } = action;
+  const input = getFileExtension(fileName);
+  const output = removeFileExtension(fileName) + "." + to;
   ffmpeg.writeFile(input, await fetchFile(file));
 
-  let ffmpeg_cmd: any = [];
+  let ffmpegCmd: string[] = [];
 
   if (to === "3gp")
-    ffmpeg_cmd = [
+    ffmpegCmd = [
       "-i",
       input,
       "-r",
@@ -52,12 +52,12 @@ export default async function convertFile(
       "24k",
       output,
     ];
-  else ffmpeg_cmd = ["-i", input, output];
+  else ffmpegCmd = ["-i", input, output];
 
-  await ffmpeg.exec(ffmpeg_cmd);
+  await ffmpeg.exec(ffmpegCmd);
 
-  const data = (await ffmpeg.readFile(output)) as any;
-  const blob = new Blob([data], { type: file_type.split("/")[0] });
+  const data = (await ffmpeg.readFile(output)) as Uint8Array;
+  const blob = new Blob([data], { type: fileType.split("/")[0] });
   const url = URL.createObjectURL(blob);
   return { url, output };
 }

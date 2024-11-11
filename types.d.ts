@@ -1,13 +1,13 @@
 export type Action = {
-  file: any;
-  file_name: string;
-  file_size: number;
+  file: File;
+  fileName: string;
+  fileSize: number;
   from: string;
   to: string | null;
-  file_type: string;
-  is_converting: boolean;
-  is_converted: boolean;
-  is_error: boolean;
-  url?: any;
-  output?: any;
+  fileType: string;
+  isConverting: boolean;
+  isConverted: boolean;
+  isError: boolean;
+  url?: string;
+  output?: string;
 };

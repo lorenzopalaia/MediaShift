@@ -11,6 +11,9 @@ export const metadata: Metadata = {
   title: "MediaShift",
   description:
     "MediaShift - Free, self-hosted, no-limits, no-ads, no-anything, no BS file conversion service",
+  creator: "Lorenzo Palaia",
+  keywords:
+    "media, conversion, free, unlimited, no-ads, no-limits, image converter, video converter, audio converter, unlimited image converter, unlimited video converter",
 };
 
 export default function RootLayout({
@@ -29,7 +32,7 @@ export default function RootLayout({
         >
           <Navbar />
           <Toaster />
-          <div className="container mx-auto px-8 max-w-4xl min-h-screen pt-32 lg:pt-36 2xl:pt-44 lg:max-w-6xl 2xl:max-w-7xl">
+          <div className="container mx-auto px-8 pt-32 min-h-screen lg:pt-36 2xl:pt-44 max-w-4xl lg:max-w-6xl 2xl:max-w-7xl">
             {children}
           </div>
         </ThemeProvider>

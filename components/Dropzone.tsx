@@ -72,22 +72,17 @@ const extensions = {
 
 export default function Dropzone() {
   const { toast } = useToast();
-
-  const [is_hover, setIsHover] = useState<boolean>(false);
+  const [isHover, setIsHover] = useState<boolean>(false);
   const [actions, setActions] = useState<Action[]>([]);
-  const [is_ready, setIsReady] = useState<boolean>(false);
+  const [isReady, setIsReady] = useState<boolean>(false);
   const [files, setFiles] = useState<Array<File>>([]);
-  const [is_loaded, setIsLoaded] = useState<boolean>(false);
-  const [is_converting, setIsConverting] = useState<boolean>(false);
-  const [is_done, setIsDone] = useState<boolean>(false);
-
+  const [isLoaded, setIsLoaded] = useState<boolean>(false);
+  const [isConverting, setIsConverting] = useState<boolean>(false);
+  const [isDone, setIsDone] = useState<boolean>(false);
   const ffmpegRef = useRef<FFmpeg | null>(null);
-
   const [defaultValues, setDefaultValues] = useState<string>("video");
-
-  const [selected, setSelected] = useState<string>("...");
-
-  const accepted_files = {
+  const [selcted, setSelected] = useState<string>("...");
+  const acceptedFiles = {
     "image/*": [
       ".jpg",
       ".jpeg",
@@ -110,123 +105,104 @@ export default function Dropzone() {
     setActions([]);
     setFiles([]);
     setIsReady(false);
-    setIsLoaded(false);
-  };
-
-  const download = (action: Action) => {
-    const a = document.createElement("a");
-    a.style.display = "none";
-    a.href = action.url;
-
-    document.body.appendChild(a);
-    a.click();
-
-    URL.revokeObjectURL(action.url);
-    document.body.removeChild(a);
+    setIsConverting(false);
   };
 
   const downloadAll = (): void => {
     for (const action of actions) {
-      if (!action.is_error) {
+      if (!action.isError) {
         download(action);
       }
     }
   };
 
-  const convert = async (): Promise<void> => {
-    if (!ffmpegRef.current) {
-      toast({
-        variant: "destructive",
-        title: "FFmpeg not loaded",
-        description: "Please wait for FFmpeg to load before converting files.",
-        duration: 5000,
-      });
-      return;
+  const download = (action: Action) => {
+    const a = document.createElement("a");
+    a.style.display = "none";
+    if (action.url) {
+      a.href = action.url;
+    }
+    if (action.output) {
+      a.download = action.output;
     }
 
-    let tmp_actions = actions.map((elt: Action) => ({
-      ...elt,
-      is_converting: true,
-    }));
-    setActions(tmp_actions);
-    setIsConverting(true);
+    document.body.appendChild(a);
+    a.click();
 
-    for (const action of tmp_actions) {
+    if (action.url) {
+      URL.revokeObjectURL(action.url);
+    }
+    document.body.removeChild(a);
+  };
+
+  const convert = async (): Promise<void> => {
+    let tmpActions = actions.map((elt) => ({
+      ...elt,
+      isConverting: true,
+    }));
+    setActions(tmpActions);
+    setIsConverting(true);
+    for (const action of tmpActions) {
       try {
-        const { url, output } = await convertFile(ffmpegRef.current, action);
-        tmp_actions = tmp_actions.map((elt: Action) =>
-          elt === action
-            ? {
-                ...elt,
-                is_converted: true,
-                is_converting: false,
-                url,
-                output,
-              }
-            : elt
-        );
-        setActions(tmp_actions);
+        if (ffmpegRef.current) {
+          const { url, output } = await convertFile(ffmpegRef.current, action);
+          tmpActions = tmpActions.map((elt) =>
+            elt === action
+              ? {
+                  ...elt,
+                  isConverted: true,
+                  isConverting: false,
+                  url,
+                  output,
+                }
+              : elt
+          );
+          setActions(tmpActions);
+        }
       } catch {
-        tmp_actions = tmp_actions.map((elt: Action) =>
+        tmpActions = tmpActions.map((elt) =>
           elt === action
             ? {
                 ...elt,
-                is_converted: false,
-                is_converting: false,
-                is_error: true,
+                isConverted: false,
+                isConverting: false,
+                isError: true,
               }
             : elt
         );
-        setActions(tmp_actions);
+        setActions(tmpActions);
       }
     }
     setIsDone(true);
     setIsConverting(false);
   };
 
-  const handleHover = (): void => {
-    setIsHover(true);
-  };
-
-  const handleExitHover = (): void => {
-    setIsHover(false);
-  };
-
   const handleUpload = (data: File[]): void => {
     handleExitHover();
     setFiles(data);
-    const tmp: Action[] = data.map((file: File) => ({
-      file_name: file.name,
-      file_size: file.size,
-      from: file.name.slice(((file.name.lastIndexOf(".") - 1) >>> 0) + 2),
-      to: null,
-      file_type: file.type,
-      file,
-      is_converted: false,
-      is_converting: false,
-      is_error: false,
-    }));
+    const tmp: Action[] = [];
     data.forEach((file: File) => {
-      // const formData = new FormData();
       tmp.push({
-        file_name: file.name,
-        file_size: file.size,
+        fileName: file.name,
+        fileSize: file.size,
         from: file.name.slice(((file.name.lastIndexOf(".") - 1) >>> 0) + 2),
         to: null,
-        file_type: file.type,
+        fileType: file.type,
         file,
-        is_converted: false,
-        is_converting: false,
-        is_error: false,
+        isConverted: false,
+        isConverting: false,
+        isError: false,
       });
     });
     setActions(tmp);
   };
 
-  const updateAction = (file_name: string, to: string) => {
+  const handleHover = (): void => setIsHover(true);
+  const handleExitHover = (): void => setIsHover(false);
+  const updateAction = (fileName: string, to: string) => {
     setActions(
       actions.map((action): Action => {
-        if (action.file_name === file_name) {
+        if (action.fileName === fileName) {
           console.log("FOUND");
           return {
             ...action,
@@ -239,18 +215,18 @@ export default function Dropzone() {
     );
   };
 
-  const checkIsReady = useCallback((): void => {
-    let tmp_is_ready = true;
-    actions.forEach((action: Action) => {
-      if (!action.to) tmp_is_ready = false;
-    });
-    setIsReady(tmp_is_ready);
-  }, [actions]);
-
   const deleteAction = (action: Action): void => {
     setActions(actions.filter((elt) => elt !== action));
-    setFiles(files.filter((elt) => elt.name !== action.file_name));
+    setFiles(files.filter((elt) => elt.name !== action.fileName));
   };
+
+  const checkIsReady = useCallback((): void => {
+    let tmpIsReady = true;
+    actions.forEach((action: Action) => {
+      if (!action.to) tmpIsReady = false;
+    });
+    setIsReady(tmpIsReady);
+  }, [actions]);
 
   useEffect(() => {
     if (!actions.length) {
@@ -261,15 +237,15 @@ export default function Dropzone() {
     } else checkIsReady();
   }, [actions, checkIsReady]);
 
+  const load = async () => {
+    const ffmpegResponse: FFmpeg = await loadFfmpeg();
+    ffmpegRef.current = ffmpegResponse;
+    setIsLoaded(true);
+  };
+
   useEffect(() => {
     load();
   }, []);
-
-  const load = async () => {
-    const ffmpeg_response: FFmpeg = await loadFfmpeg();
-    ffmpegRef.current = ffmpeg_response;
-    setIsLoaded(true);
-  };
 
   if (actions.length) {
     return (
@@ -277,35 +253,35 @@ export default function Dropzone() {
         {actions.map((action: Action, i: number) => (
           <div
             key={i}
-            className="relative flex flex-wrap items-center justify-between w-full px-4 py-4 space-y-2 border cursor-pointer lg:py-0 rounded-xl h-fit lg:h-20 lg:px-10 lg:flex-nowrap"
+            className="w-full py-4 space-y-2 lg:py-0 relative cursor-pointer rounded-xl border h-fit lg:h-20 px-4 lg:px-10 flex flex-wrap lg:flex-nowrap items-center justify-between"
           >
-            {!is_loaded && (
-              <Skeleton className="absolute w-full h-full -ml-10 cursor-progress rounded-xl" />
+            {!isLoaded && (
+              <Skeleton className="h-full w-full -ml-10 cursor-progress absolute rounded-xl" />
             )}
-            <div className="flex items-center gap-4">
+            <div className="flex gap-4 items-center">
               <span className="text-2xl text-orange-600">
-                {fileToIcon(action.file_type)}
+                {fileToIcon(action.fileType)}
               </span>
               <div className="flex items-center gap-1 w-96">
-                <span className="overflow-x-hidden font-medium text-md">
-                  {compressFileName(action.file_name)}
+                <span className="text-md font-medium overflow-x-hidden">
+                  {compressFileName(action.fileName)}
                 </span>
-                <span className="text-sm text-muted-foreground">
-                  ({bytesToSize(action.file_size)})
+                <span className="text-muted-foreground text-sm">
+                  ({bytesToSize(action.fileSize)})
                 </span>
               </div>
             </div>
-            {action.is_error ? (
+            {action.isError ? (
               <Badge variant="destructive" className="flex gap-2">
                 <span>Error Converting File</span>
                 <BiError />
               </Badge>
-            ) : action.is_converting ? (
-              <Badge variant="default" className="flex gap-2">
+            ) : action.isConverted ? (
+              <Badge variant="default" className="flex gap-2 bg-green-500">
                 <span>Done</span>
                 <MdDone />
               </Badge>
-            ) : action.is_converting ? (
+            ) : action.isConverting ? (
               <Badge variant="default" className="flex gap-2">
                 <span>Converting</span>
                 <span className="animate-spin">
@@ -313,7 +289,7 @@ export default function Dropzone() {
                 </span>
               </Badge>
             ) : (
-              <div className="flex items-center gap-4 text-muted-foreground text-md">
+              <div className="text-muted-foreground text-md flex items-center gap-4">
                 <span>Convert to</span>
                 <Select
                   onValueChange={(value) => {
@@ -323,15 +299,15 @@ export default function Dropzone() {
                       setDefaultValues("video");
                     }
                     setSelected(value);
-                    updateAction(action.file_name, value);
+                    updateAction(action.fileName, value);
                   }}
-                  value={selected}
+                  value={selcted}
                 >
-                  <SelectTrigger className="w-32 font-medium text-center outline-none focus:outline-none focus:ring-0 text-muted-foreground bg-background text-md">
+                  <SelectTrigger className="w-32 outline-none focus:outline-none focus:ring-0 text-center text-muted-foreground bg-background text-md font-medium">
                     <SelectValue placeholder="..." />
                   </SelectTrigger>
                   <SelectContent className="h-fit">
-                    {action.file_type.includes("image") && (
+                    {action.fileType.includes("image") && (
                       <div className="grid grid-cols-2 gap-2 w-fit">
                         {extensions.image.map((elt, i) => (
                           <div key={i} className="col-span-1 text-center">
@@ -342,7 +318,7 @@ export default function Dropzone() {
                         ))}
                       </div>
                     )}
-                    {action.file_type.includes("video") && (
+                    {action.fileType.includes("video") && (
                       <Tabs defaultValue={defaultValues} className="w-full">
                         <TabsList className="w-full">
                           <TabsTrigger value="video" className="w-full">
@@ -376,7 +352,7 @@ export default function Dropzone() {
                         </TabsContent>
                       </Tabs>
                     )}
-                    {action.file_type.includes("audio") && (
+                    {action.fileType.includes("audio") && (
                       <div className="grid grid-cols-2 gap-2 w-fit">
                         {extensions.audio.map((elt, i) => (
                           <div key={i} className="col-span-1 text-center">
@@ -391,26 +367,26 @@ export default function Dropzone() {
                 </Select>
               </div>
             )}
-            {action.is_converted ? (
+            {action.isConverted ? (
               <Button variant="outline" onClick={() => download(action)}>
                 Download
               </Button>
             ) : (
               <span
                 onClick={() => deleteAction(action)}
-                className="flex items-center justify-center w-10 h-10 text-2xl rounded-full cursor-pointer hover:bg-muted text-foreground"
+                className="cursor-pointer hover:bg-muted rounded-full h-10 w-10 flex items-center justify-center text-2xl text-foreground"
               >
                 <MdClose />
               </span>
             )}
           </div>
         ))}
-        <div className="flex justify-end w-full">
-          {is_done ? (
+        <div className="flex w-full justify-end">
+          {isDone ? (
             <div className="space-y-4 w-fit">
               <Button
                 size="lg"
-                className="relative flex items-center w-full gap-2 py-4 font-semibold rounded-xl text-md"
+                className="rounded-xl font-semibold relative py-4 text-md flex gap-2 items-center w-full"
                 onClick={downloadAll}
               >
                 {actions.length > 1 ? "Download All" : "Download"}
@@ -428,12 +404,12 @@ export default function Dropzone() {
           ) : (
             <Button
               size="lg"
-              disabled={!is_ready || is_converting}
-              className="relative flex items-center py-4 font-semibold rounded-xl text-md w-44"
+              disabled={!isReady || isConverting}
+              className="rounded-xl font-semibold relative py-4 text-md flex items-center w-44"
               onClick={convert}
             >
-              {is_converting ? (
-                <span className="text-lg animate-spin">
+              {isConverting ? (
+                <span className="animate-spin text-lg">
                   <ImSpinner3 />
                 </span>
               ) : (
@@ -451,7 +427,7 @@ export default function Dropzone() {
       onDrop={handleUpload}
       onDragEnter={handleHover}
       onDragLeave={handleExitHover}
-      accept={accepted_files}
+      accept={acceptedFiles}
       onDropRejected={() => {
         handleExitHover();
         toast({
@@ -474,25 +450,25 @@ export default function Dropzone() {
       {({ getRootProps, getInputProps }) => (
         <div
           {...getRootProps()}
-          className="flex items-center justify-center border-2 border-dashed shadow-sm cursor-pointer bg-background h-72 lg:h-80 xl:h-96 rounded-3xl border-secondary"
+          className=" bg-background h-72 lg:h-80 xl:h-96 rounded-3xl shadow-sm border-secondary border-2 border-dashed cursor-pointer flex items-center justify-center"
         >
           <input {...getInputProps()} />
           <div className="space-y-4 text-foreground">
-            {is_hover ? (
+            {isHover ? (
               <>
-                <div className="flex justify-center text-6xl">
+                <div className="justify-center flex text-6xl">
                   <LuFileSymlink />
                 </div>
-                <h3 className="text-2xl font-medium text-center">
+                <h3 className="text-center font-medium text-2xl">
                   Yes, right there
                 </h3>
               </>
             ) : (
               <>
-                <div className="flex justify-center text-6xl">
+                <div className="justify-center flex text-6xl">
                   <FiUploadCloud />
                 </div>
-                <h3 className="text-2xl font-medium text-center">
+                <h3 className="text-center font-medium text-2xl">
                   Click, or drop your files here
                 </h3>
               </>
