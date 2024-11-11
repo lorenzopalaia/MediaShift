@@ -34,8 +34,11 @@ Free, self-hosted, no-limits, no-ads, no-anything, no BS file conversion service
 ### Built With
 
 [![Next.js][Next.js]][Next-url]
+<br />
 [![React.js][React.js]][React-url]
+<br />
 [![TailwindCSS][TailwindCSS]][TailwindCSS-url]
+<br />
 [![Node][Node.js]][Node-url]
 
 <p align="right">(<a href="#top">back to top</a>)</p>
