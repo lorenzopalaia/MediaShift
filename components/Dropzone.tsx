@@ -7,6 +7,7 @@ import { MdDone } from "react-icons/md";
 import { BiError } from "react-icons/bi";
 import { HiOutlineDownload } from "react-icons/hi";
 import { ImSpinner3 } from "react-icons/im";
+import { FaPlus } from "react-icons/fa6";
 
 import ReactDropzone from "react-dropzone";
 import { FFmpeg } from "@ffmpeg/ffmpeg";
@@ -81,7 +82,6 @@ export default function Dropzone() {
   const [isDone, setIsDone] = useState<boolean>(false);
   const ffmpegRef = useRef<FFmpeg | null>(null);
   const [defaultValues, setDefaultValues] = useState<string>("video");
-  const [selcted, setSelected] = useState<string>("...");
   const acceptedFiles = {
     "image/*": [
       ".jpg",
@@ -298,10 +298,9 @@ export default function Dropzone() {
                     } else if (extensions.video.includes(value)) {
                       setDefaultValues("video");
                     }
-                    setSelected(value);
                     updateAction(action.fileName, value);
                   }}
-                  value={selcted}
+                  value={action.to || "..."}
                 >
                   <SelectTrigger className="w-32 outline-none focus:outline-none focus:ring-0 text-center text-muted-foreground bg-background text-md font-medium">
                     <SelectValue placeholder="..." />
@@ -381,6 +380,65 @@ export default function Dropzone() {
             )}
           </div>
         ))}
+        {!isDone && !isConverting && (
+          <ReactDropzone
+            onDrop={(acceptedFiles) => {
+              handleUpload([...files, ...acceptedFiles]);
+            }}
+            onDragEnter={handleHover}
+            onDragLeave={handleExitHover}
+            accept={acceptedFiles}
+            onDropRejected={() => {
+              handleExitHover();
+              toast({
+                variant: "destructive",
+                title: "Error uploading your file(s)",
+                description: "Allowed Files: Audio, Video and Images.",
+                duration: 5000,
+              });
+            }}
+            onError={() => {
+              handleExitHover();
+              toast({
+                variant: "destructive",
+                title: "Error uploading your file(s)",
+                description: "Allowed Files: Audio, Video and Images.",
+                duration: 5000,
+              });
+            }}
+          >
+            {({ getRootProps, getInputProps }) => (
+              <div
+                {...getRootProps()}
+                className=" bg-background h-72 lg:h-80 xl:h-96 rounded-3xl shadow-sm border-secondary border-2 border-dashed cursor-pointer flex items-center justify-center"
+              >
+                <input {...getInputProps()} />
+                <div className="space-y-4 text-foreground">
+                  {isHover ? (
+                    <>
+                      <div className="justify-center flex text-6xl">
+                        <LuFileSymlink />
+                      </div>
+                      <h3 className="text-center font-medium text-2xl">
+                        Yes, right there
+                      </h3>
+                    </>
+                  ) : (
+                    <>
+                      <div className="justify-center flex text-6xl">
+                        <FaPlus />
+                      </div>
+                      <h3 className="text-center font-medium text-2xl">
+                        Add more files
+                      </h3>
+                    </>
+                  )}
+                </div>
+              </div>
+            )}
+          </ReactDropzone>
+        )}
+
         <div className="flex w-full justify-end">
           {isDone ? (
             <div className="space-y-4 w-fit">
