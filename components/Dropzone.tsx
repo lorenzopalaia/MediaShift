@@ -122,23 +122,25 @@ export default function Dropzone() {
 
   const handleUpload = (data: File[]): void => {
     handleExitHover();
-    setFiles(data);
-    const tmp: Action[] = [];
-    data.forEach((file: File) => {
-      tmp.push({
-        fileName: file.name,
-        fileSize: file.size,
-        from: file.name.slice(((file.name.lastIndexOf(".") - 1) >>> 0) + 2),
-        to: null,
-        fileType: file.type,
-        file,
-        isConverted: false,
-        isConverting: false,
-        isError: false,
-      });
-    });
-    setActions(tmp);
+    const newFiles = data.filter(
+      (file) => !files.some((existingFile) => existingFile.name === file.name)
+    );
+    const updatedFiles = [...files, ...newFiles];
+    setFiles(updatedFiles);
+    const tmp: Action[] = newFiles.map((file: File) => ({
+      fileName: file.name,
+      fileSize: file.size,
+      from: file.name.slice(((file.name.lastIndexOf(".") - 1) >>> 0) + 2),
+      to: null,
+      fileType: file.type,
+      file,
+      isConverted: false,
+      isConverting: false,
+      isError: false,
+    }));
+    setActions((prevActions) => [...prevActions, ...tmp]);
   };
+
   const handleHover = (): void => setIsHover(true);
   const handleExitHover = (): void => setIsHover(false);
 
@@ -146,17 +148,16 @@ export default function Dropzone() {
     setActions(
       actions.map((action): Action => {
         if (action.fileName === fileName) {
-          console.log("FOUND");
           return {
             ...action,
             to,
           };
         }
-
         return action;
       })
     );
   };
+
   const deleteAction = (action: Action): void => {
     setActions(actions.filter((elt) => elt !== action));
     setFiles(files.filter((elt) => elt.name !== action.fileName));
