@@ -2,23 +2,20 @@
 
 import { FiUploadCloud } from "react-icons/fi";
 import { LuFileSymlink } from "react-icons/lu";
-import { MdClose } from "react-icons/md";
-import { MdDone } from "react-icons/md";
+import { MdClose, MdDone } from "react-icons/md";
 import { BiError } from "react-icons/bi";
 import { HiOutlineDownload } from "react-icons/hi";
 import { ImSpinner3 } from "react-icons/im";
 import { FaPlus } from "react-icons/fa6";
 
 import ReactDropzone from "react-dropzone";
+
 import { FFmpeg } from "@ffmpeg/ffmpeg";
 
-import bytesToSize from "@/utils/bytesToSize";
-import fileToIcon from "@/utils/fileToIcon";
-import compressFileName from "@/utils/compressFileName";
-import convertFile from "@/utils/convertFile";
-import loadFfmpeg from "@/utils/loadFfmpeg";
+import { bytesToSize, fileToIcon, compressFileName } from "@/utils/fileUtils";
+import { loadFfmpeg, convertFile, downloadFile } from "@/utils/ffmpegUtils";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
 
 import { Skeleton } from "@/components/ui/skeleton";
@@ -34,42 +31,7 @@ import {
 import { Button } from "@/components/ui/button";
 
 import type { Action } from "@/types";
-
-const extensions = {
-  image: [
-    "jpg",
-    "jpeg",
-    "png",
-    "gif",
-    "bmp",
-    "webp",
-    "ico",
-    "tif",
-    "tiff",
-    "svg",
-    "raw",
-    "tga",
-  ],
-  video: [
-    "mp4",
-    "m4v",
-    "mp4v",
-    "3gp",
-    "3g2",
-    "avi",
-    "mov",
-    "wmv",
-    "mkv",
-    "flv",
-    "ogv",
-    "webm",
-    "h264",
-    "264",
-    "hevc",
-    "265",
-  ],
-  audio: ["mp3", "wav", "ogg", "aac", "wma", "flac", "m4a"],
-};
+import { extensions } from "@/utils/extensions";
 
 export default function Dropzone() {
   const { toast } = useToast();
@@ -111,28 +73,9 @@ export default function Dropzone() {
   const downloadAll = (): void => {
     for (const action of actions) {
       if (!action.isError) {
-        download(action);
+        downloadFile(action);
       }
     }
-  };
-
-  const download = (action: Action) => {
-    const a = document.createElement("a");
-    a.style.display = "none";
-    if (action.url) {
-      a.href = action.url;
-    }
-    if (action.output) {
-      a.download = action.output;
-    }
-
-    document.body.appendChild(a);
-    a.click();
-
-    if (action.url) {
-      URL.revokeObjectURL(action.url);
-    }
-    document.body.removeChild(a);
   };
 
   const convert = async (): Promise<void> => {
@@ -196,9 +139,9 @@ export default function Dropzone() {
     });
     setActions(tmp);
   };
-
   const handleHover = (): void => setIsHover(true);
   const handleExitHover = (): void => setIsHover(false);
+
   const updateAction = (fileName: string, to: string) => {
     setActions(
       actions.map((action): Action => {
@@ -214,36 +157,37 @@ export default function Dropzone() {
       })
     );
   };
-
   const deleteAction = (action: Action): void => {
     setActions(actions.filter((elt) => elt !== action));
     setFiles(files.filter((elt) => elt.name !== action.fileName));
   };
 
-  const checkIsReady = useCallback((): void => {
-    let tmpIsReady = true;
-    actions.forEach((action: Action) => {
-      if (!action.to) tmpIsReady = false;
-    });
-    setIsReady(tmpIsReady);
-  }, [actions]);
-
   useEffect(() => {
+    const checkIsReady = (): void => {
+      let tmpIsReady = true;
+      actions.forEach((action: Action) => {
+        if (!action.to) tmpIsReady = false;
+      });
+      setIsReady(tmpIsReady);
+    };
+
     if (!actions.length) {
       setIsDone(false);
       setFiles([]);
       setIsReady(false);
       setIsConverting(false);
-    } else checkIsReady();
-  }, [actions, checkIsReady]);
-
-  const load = async () => {
-    const ffmpegResponse: FFmpeg = await loadFfmpeg();
-    ffmpegRef.current = ffmpegResponse;
-    setIsLoaded(true);
-  };
+    } else {
+      checkIsReady();
+    }
+  }, [actions]);
 
   useEffect(() => {
+    const load = async () => {
+      const ffmpegResponse: FFmpeg = await loadFfmpeg();
+      ffmpegRef.current = ffmpegResponse;
+      setIsLoaded(true);
+    };
+
     load();
   }, []);
 
@@ -367,7 +311,7 @@ export default function Dropzone() {
               </div>
             )}
             {action.isConverted ? (
-              <Button variant="outline" onClick={() => download(action)}>
+              <Button variant="outline" onClick={() => downloadFile(action)}>
                 Download
               </Button>
             ) : (
