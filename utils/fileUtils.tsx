@@ -41,7 +41,7 @@ export const compressFileName = (fileName: string): string => {
     const compressedFileName =
       fileNameWithoutExtension.substring(
         0,
-        maxSubstrLength - (fileExtension ? fileExtension.length : 0) - 3
+        maxSubstrLength - (fileExtension ? fileExtension.length : 0) - 3,
       ) +
       "..." +
       fileNameWithoutExtension.slice(-charsToKeep) +

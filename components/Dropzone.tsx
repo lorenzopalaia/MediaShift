@@ -98,7 +98,7 @@ export default function Dropzone() {
                   url,
                   output,
                 }
-              : elt
+              : elt,
           );
           setActions(tmpActions);
         }
@@ -111,7 +111,7 @@ export default function Dropzone() {
                 isConverting: false,
                 isError: true,
               }
-            : elt
+            : elt,
         );
         setActions(tmpActions);
       }
@@ -123,7 +123,7 @@ export default function Dropzone() {
   const handleUpload = (data: File[]): void => {
     handleExitHover();
     const newFiles = data.filter(
-      (file) => !files.some((existingFile) => existingFile.name === file.name)
+      (file) => !files.some((existingFile) => existingFile.name === file.name),
     );
     const updatedFiles = [...files, ...newFiles];
     setFiles(updatedFiles);
@@ -154,7 +154,7 @@ export default function Dropzone() {
           };
         }
         return action;
-      })
+      }),
     );
   };
 
@@ -198,20 +198,20 @@ export default function Dropzone() {
         {actions.map((action: Action, i: number) => (
           <div
             key={i}
-            className="w-full py-4 space-y-2 lg:py-0 relative cursor-pointer rounded-xl border h-fit lg:h-20 px-4 lg:px-10 flex flex-wrap lg:flex-nowrap items-center justify-between"
+            className="relative flex h-fit w-full cursor-pointer flex-wrap items-center justify-between space-y-2 rounded-xl border border-muted-foreground bg-primary/5 px-4 py-4 backdrop-blur-xl lg:h-20 lg:flex-nowrap lg:px-10 lg:py-0"
           >
             {!isLoaded && (
-              <Skeleton className="h-full w-full -ml-10 cursor-progress absolute rounded-xl" />
+              <Skeleton className="absolute -ml-10 h-full w-full cursor-progress rounded-xl" />
             )}
-            <div className="flex gap-4 items-center">
+            <div className="flex items-center gap-4">
               <span className="text-2xl text-orange-600">
                 {fileToIcon(action.fileType)}
               </span>
-              <div className="flex items-center gap-1 w-96">
-                <span className="text-md font-medium overflow-x-hidden">
+              <div className="flex w-96 items-center gap-1">
+                <span className="text-md overflow-x-hidden font-medium">
                   {compressFileName(action.fileName)}
                 </span>
-                <span className="text-muted-foreground text-sm">
+                <span className="text-sm text-muted-foreground">
                   ({bytesToSize(action.fileSize)})
                 </span>
               </div>
@@ -234,7 +234,7 @@ export default function Dropzone() {
                 </span>
               </Badge>
             ) : (
-              <div className="text-muted-foreground text-md flex items-center gap-4">
+              <div className="text-md flex items-center gap-4 text-muted-foreground">
                 <span>Convert to</span>
                 <Select
                   onValueChange={(value) => {
@@ -247,12 +247,12 @@ export default function Dropzone() {
                   }}
                   value={action.to || "..."}
                 >
-                  <SelectTrigger className="w-32 outline-none focus:outline-none focus:ring-0 text-center text-muted-foreground bg-background text-md font-medium">
+                  <SelectTrigger className="text-md w-32 bg-background text-center font-medium text-muted-foreground outline-none focus:outline-none focus:ring-0">
                     <SelectValue placeholder="..." />
                   </SelectTrigger>
                   <SelectContent className="h-fit">
                     {action.fileType.includes("image") && (
-                      <div className="grid grid-cols-2 gap-2 w-fit">
+                      <div className="grid w-fit grid-cols-2 gap-2">
                         {extensions.image.map((elt, i) => (
                           <div key={i} className="col-span-1 text-center">
                             <SelectItem value={elt} className="mx-auto">
@@ -273,7 +273,7 @@ export default function Dropzone() {
                           </TabsTrigger>
                         </TabsList>
                         <TabsContent value="video">
-                          <div className="grid grid-cols-3 gap-2 w-fit">
+                          <div className="grid w-fit grid-cols-3 gap-2">
                             {extensions.video.map((elt, i) => (
                               <div key={i} className="col-span-1 text-center">
                                 <SelectItem value={elt} className="mx-auto">
@@ -284,7 +284,7 @@ export default function Dropzone() {
                           </div>
                         </TabsContent>
                         <TabsContent value="audio">
-                          <div className="grid grid-cols-3 gap-2 w-fit">
+                          <div className="grid w-fit grid-cols-3 gap-2">
                             {extensions.audio.map((elt, i) => (
                               <div key={i} className="col-span-1 text-center">
                                 <SelectItem value={elt} className="mx-auto">
@@ -297,7 +297,7 @@ export default function Dropzone() {
                       </Tabs>
                     )}
                     {action.fileType.includes("audio") && (
-                      <div className="grid grid-cols-2 gap-2 w-fit">
+                      <div className="grid w-fit grid-cols-2 gap-2">
                         {extensions.audio.map((elt, i) => (
                           <div key={i} className="col-span-1 text-center">
                             <SelectItem value={elt} className="mx-auto">
@@ -318,7 +318,7 @@ export default function Dropzone() {
             ) : (
               <span
                 onClick={() => deleteAction(action)}
-                className="cursor-pointer hover:bg-muted rounded-full h-10 w-10 flex items-center justify-center text-2xl text-foreground"
+                className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full text-2xl text-foreground hover:bg-muted"
               >
                 <MdClose />
               </span>
@@ -355,25 +355,25 @@ export default function Dropzone() {
             {({ getRootProps, getInputProps }) => (
               <div
                 {...getRootProps()}
-                className=" bg-background h-72 lg:h-80 xl:h-96 rounded-3xl shadow-sm border-secondary border-2 border-dashed cursor-pointer flex items-center justify-center"
+                className="flex h-72 cursor-pointer items-center justify-center rounded-3xl border-2 border-dashed border-muted-foreground bg-primary/5 shadow-sm backdrop-blur-xl lg:h-80 xl:h-96"
               >
                 <input {...getInputProps()} />
                 <div className="space-y-4 text-foreground">
                   {isHover ? (
                     <>
-                      <div className="justify-center flex text-6xl">
+                      <div className="flex justify-center text-6xl">
                         <LuFileSymlink />
                       </div>
-                      <h3 className="text-center font-medium text-2xl">
+                      <h3 className="text-center text-2xl font-medium">
                         Yes, right there
                       </h3>
                     </>
                   ) : (
                     <>
-                      <div className="justify-center flex text-6xl">
+                      <div className="flex justify-center text-6xl">
                         <FaPlus />
                       </div>
-                      <h3 className="text-center font-medium text-2xl">
+                      <h3 className="text-center text-2xl font-medium">
                         Add more files
                       </h3>
                     </>
@@ -383,13 +383,12 @@ export default function Dropzone() {
             )}
           </ReactDropzone>
         )}
-
         <div className="flex w-full justify-end">
           {isDone ? (
-            <div className="space-y-4 w-fit">
+            <div className="w-fit space-y-4">
               <Button
                 size="lg"
-                className="rounded-xl font-semibold relative py-4 text-md flex gap-2 items-center w-full"
+                className="text-md relative flex w-full items-center gap-2 rounded-xl py-4 font-semibold"
                 onClick={downloadAll}
               >
                 {actions.length > 1 ? "Download All" : "Download"}
@@ -408,7 +407,7 @@ export default function Dropzone() {
             <Button
               size="lg"
               disabled={!isReady || isConverting}
-              className="rounded-xl font-semibold relative py-4 text-md flex items-center w-44"
+              className="text-md relative flex w-44 items-center rounded-xl py-4 font-semibold"
               onClick={convert}
             >
               {isConverting ? (
@@ -453,25 +452,25 @@ export default function Dropzone() {
       {({ getRootProps, getInputProps }) => (
         <div
           {...getRootProps()}
-          className=" bg-background h-72 lg:h-80 xl:h-96 rounded-3xl shadow-sm border-secondary border-2 border-dashed cursor-pointer flex items-center justify-center"
+          className="flex h-72 cursor-pointer items-center justify-center rounded-3xl border-2 border-dashed border-muted-foreground bg-primary/5 shadow-sm backdrop-blur-xl lg:h-80 xl:h-96"
         >
           <input {...getInputProps()} />
           <div className="space-y-4 text-foreground">
             {isHover ? (
               <>
-                <div className="justify-center flex text-6xl">
+                <div className="flex justify-center text-6xl">
                   <LuFileSymlink />
                 </div>
-                <h3 className="text-center font-medium text-2xl">
+                <h3 className="text-center text-2xl font-medium">
                   Yes, right there
                 </h3>
               </>
             ) : (
               <>
-                <div className="justify-center flex text-6xl">
+                <div className="flex justify-center text-6xl">
                   <FiUploadCloud />
                 </div>
-                <h3 className="text-center font-medium text-2xl">
+                <h3 className="text-center text-2xl font-medium">
                   Click, or drop your files here
                 </h3>
               </>

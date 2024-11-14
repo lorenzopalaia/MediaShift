@@ -31,7 +31,7 @@ export const loadFfmpeg = async (): Promise<FFmpeg> => {
 
 export const convertFile = async (
   ffmpeg: FFmpeg,
-  action: Action
+  action: Action,
 ): Promise<{ url: string; output: string }> => {
   const { file, to, fileName, fileType } = action;
   const input = getFileExtension(fileName);
