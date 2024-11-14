@@ -26,7 +26,7 @@ export const fileToIcon = (fileType: string): JSX.Element => {
 };
 
 export const compressFileName = (fileName: string): string => {
-  const maxSubstrLength = 18;
+  const maxSubstrLength = 12;
 
   if (fileName.length > maxSubstrLength) {
     const fileNameWithoutExtension = fileName.split(".").slice(0, -1).join(".");
