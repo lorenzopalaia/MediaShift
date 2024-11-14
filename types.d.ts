@@ -10,4 +10,5 @@ export type Action = {
   isError: boolean;
   url?: string;
   output?: string;
+  outputFileSize?: number;
 };

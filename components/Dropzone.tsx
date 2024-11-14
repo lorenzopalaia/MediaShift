@@ -214,13 +214,15 @@ export default function Dropzone() {
               <div className="flex w-96 items-center gap-1">
                 <span className="text-md overflow-x-hidden font-medium">
                   {compressFileName(
-                    action.isConverted ? action.output : action.fileName,
+                    action.isConverted
+                      ? (action.output ?? "")
+                      : action.fileName,
                   )}
                 </span>
                 <span className="text-sm text-muted-foreground">
                   (
                   {bytesToSize(
-                    action.isConverted
+                    action.isConverted && action.outputFileSize !== undefined
                       ? action.outputFileSize
                       : action.fileSize,
                   )}
