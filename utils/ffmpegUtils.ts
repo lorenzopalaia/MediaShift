@@ -32,7 +32,7 @@ export const loadFfmpeg = async (): Promise<FFmpeg> => {
 export const convertFile = async (
   ffmpeg: FFmpeg,
   action: Action,
-): Promise<{ url: string; output: string }> => {
+): Promise<{ url: string; output: string; size: number }> => {
   const { file, to, fileName, fileType } = action;
   const input = getFileExtension(fileName);
   const output = removeFileExtension(fileName) + "." + to;
@@ -69,7 +69,8 @@ export const convertFile = async (
   const data = (await ffmpeg.readFile(output)) as Uint8Array;
   const blob = new Blob([data], { type: fileType.split("/")[0] });
   const url = URL.createObjectURL(blob);
-  return { url, output };
+  const size = data.length;
+  return { url, output, size };
 };
 
 export const downloadFile = (action: Action) => {

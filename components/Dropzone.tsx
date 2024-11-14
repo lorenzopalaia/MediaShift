@@ -88,7 +88,10 @@ export default function Dropzone() {
     for (const action of tmpActions) {
       try {
         if (ffmpegRef.current) {
-          const { url, output } = await convertFile(ffmpegRef.current, action);
+          const { url, output, size } = await convertFile(
+            ffmpegRef.current,
+            action,
+          );
           tmpActions = tmpActions.map((elt) =>
             elt === action
               ? {
@@ -97,6 +100,7 @@ export default function Dropzone() {
                   isConverting: false,
                   url,
                   output,
+                  outputFileSize: size,
                 }
               : elt,
           );
@@ -214,7 +218,13 @@ export default function Dropzone() {
                   )}
                 </span>
                 <span className="text-sm text-muted-foreground">
-                  ({bytesToSize(action.fileSize)})
+                  (
+                  {bytesToSize(
+                    action.isConverted
+                      ? action.outputFileSize
+                      : action.fileSize,
+                  )}
+                  )
                 </span>
               </div>
             </div>
