@@ -17,6 +17,7 @@ import { loadFfmpeg, convertFile, downloadFile } from "@/utils/ffmpegUtils";
 
 import { useState, useEffect, useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
+import useSound from "use-sound";
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
@@ -61,6 +62,7 @@ export default function Dropzone() {
     "audio/*": [],
     "video/*": [],
   };
+  const [play] = useSound("/sounds/completedFx.mp3");
 
   const reset = () => {
     setIsDone(false);
@@ -122,6 +124,7 @@ export default function Dropzone() {
     }
     setIsDone(true);
     setIsConverting(false);
+    play();
   };
 
   const handleUpload = (data: File[]): void => {
