@@ -17,7 +17,7 @@
   <p align="center">    
     MediaShift - Free, self-hosted, no-limits, no-ads, no-anything, no BS file conversion service
     <br />
-    <a href="https://mediashift.lorenzopalaia.it">View Demo</a>
+    <a href="https://mediashift.lorenzopalaia.com">View Demo</a>
   </p>
 </div>
 

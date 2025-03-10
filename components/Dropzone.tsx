@@ -32,37 +32,24 @@ import {
 import { Button } from "@/components/ui/button";
 
 import type { Action } from "@/types";
-import { extensions } from "@/utils/extensions";
+import { extensions, acceptedFiles } from "@/utils/extensions";
 
 export default function Dropzone() {
-  const { toast } = useToast();
   const [isHover, setIsHover] = useState<boolean>(false);
-  const [actions, setActions] = useState<Action[]>([]);
-  const [isReady, setIsReady] = useState<boolean>(false);
-  const [files, setFiles] = useState<Array<File>>([]);
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
+  const [isReady, setIsReady] = useState<boolean>(false);
   const [isConverting, setIsConverting] = useState<boolean>(false);
   const [isDone, setIsDone] = useState<boolean>(false);
-  const ffmpegRef = useRef<FFmpeg | null>(null);
+
+  const [actions, setActions] = useState<Action[]>([]);
+  const [files, setFiles] = useState<Array<File>>([]);
   const [defaultValues, setDefaultValues] = useState<string>("video");
-  const acceptedFiles = {
-    "image/*": [
-      ".jpg",
-      ".jpeg",
-      ".png",
-      ".gif",
-      ".bmp",
-      ".webp",
-      ".ico",
-      ".tif",
-      ".tiff",
-      ".raw",
-      ".tga",
-    ],
-    "audio/*": [],
-    "video/*": [],
-  };
+
+  const ffmpegRef = useRef<FFmpeg | null>(null);
+
   const [play] = useSound("/sounds/completedFx.mp3");
+
+  const { toast } = useToast();
 
   const reset = () => {
     setIsDone(false);

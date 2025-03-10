@@ -33,3 +33,21 @@ export const extensions = {
   ],
   audio: ["mp3", "wav", "ogg", "aac", "wma", "flac", "m4a"],
 };
+
+export const acceptedFiles = {
+  "image/*": [
+    ".jpg",
+    ".jpeg",
+    ".png",
+    ".gif",
+    ".bmp",
+    ".webp",
+    ".ico",
+    ".tif",
+    ".tiff",
+    ".raw",
+    ".tga",
+  ],
+  "audio/*": [],
+  "video/*": [],
+};
